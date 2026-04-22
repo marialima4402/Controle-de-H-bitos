@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#faf6ed">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Hábitos">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Hábitos</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Special+Elite&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:       #faf6ed;
+    --paper-mid:   #f3edd8;
+    --paper-dark:  #e8dfc8;
+    --line:        #c5d4e8;
+    --margin:      #e8a0a0;
+    --ink:         #1e1e38;
+    --ink-light:   #4a4a6a;
+    --ink-faint:   #9898b8;
+    --accent:      #3a5fa0;
+    --teal:        #1a9090;
+    --blue:        #3a6aa0;
+    --gray-pct:    #8888aa;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--paper);
+    min-height: 100vh;
+    font-family: 'Kalam', cursive;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 80px;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    width: 100%;
+    background: var(--paper-mid);
+    border-bottom: 1.5px solid var(--margin);
+    padding: 14px 18px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-row1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .app-name {
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .month-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .month-label {
+    font-family: 'Kalam', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .nav-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-faint);
+    background: transparent;
+    color: var(--ink-light);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Kalam', cursive;
+    flex-shrink: 0;
+  }
+
+  .pct-badge {
+    font-family: 'Kalam', cursive;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    background: var(--paper-dark);
+    white-space: nowrap;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    width: 100%;
+    background: var(--paper-dark);
+    border-bottom: 1.5px solid var(--line);
+  }
+
+  .tab {
+    flex: 1;
+    padding: 10px 0;
+    text-align: center;
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    transition: all .15s;
+    border-bottom: 2.5px solid transparent;
+  }
+
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: var(--paper-mid);
+  }
+
+  /* ── CONTENT PAGES ── */
+  .page { display: none; width: 100%; max-width: 480px; }
+  .page.active { display: block; }
+
+  /* ── TODAY PAGE ── */
+  .today-page {
+    padding: 16px 16px 24px;
+  }
+
+  .today-date {
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-left: 4px;
+  }
+
+  /* Sleep card */
+  .sleep-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .sleep-label {
+    font-size: 17px;
+    color: var(--ink-light);
+    font-style: italic;
+  }
+
+  .sleep-input-mobile {
+    font-family: 'Kalam', cursive;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid var(--line);
+    outline: none;
+    width: 70px;
+    text-align: center;
+    padding: 2px 4px;
+  }
+  .sleep-input-mobile::placeholder { color: var(--line); font-size: 16px; }
+
+  /* Habit cards */
+  .habit-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: border-color .15s;
+  }
+
+  .habit-card.is-done   { border-color: var(--accent); }
+  .habit-card.is-skip   { border-color: var(--line); opacity: .6; }
+
+  .habit-name-mobile {
+    font-size: 18px;
+    color: var(--ink);
+    flex: 1;
+    line-height: 1.3;
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid transparent;
+    outline: none;
+    font-family: 'Kalam', cursive;
+    padding: 2px 0;
+    min-width: 0;
+    transition: border-color .2s;
+  }
+  .habit-name-mobile:focus { border-bottom-color: var(--accent); }
+  .habit-name-mobile.empty, .habit-name-mobile::placeholder { color: var(--ink-faint); font-style: italic; font-size: 15px; }
+
+  .td-name-input-m {
+    font-family: 'Kalam', cursive;
+    font-size: 14px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 118px;
+    padding: 2px 4px;
+  }
+  .td-name-input-m.empty-m, .td-name-input-m::placeholder { color: var(--ink-faint); font-style: italic; font-size: 12px; }
+
+  /* Big circle for touch */
+  .circle-touch {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 2px solid #b8c0d8;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-family: 'Kalam', cursive;
+    font-size: 20px;
+    font-weight: 700;
+    transition: all .15s;
+    user-select: none;
+  }
+  .circle-touch.done { border-color: var(--accent); color: #2a50a0; }
+  .circle-touch.skip { border-color: #c0c0cc; color: #aaaabc; font-weight: 400; font-size: 17px; }
+  .circle-touch:active { transform: scale(.9); }
+
+  /* Day progress bar */
+  .day-progress {
+    margin: 16px 0 20px;
+    background: var(--paper);
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    padding: 12px 16px;
+  }
+
+  .day-progress-label {
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+
+  .day-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .day-progress-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--paper-dark);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .day-progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width .4s ease;
+  }
+
+  .day-progress-pct {
+    font-size: 18px;
+    font-weight: 700;
+    min-width: 42px;
+    text-align: right;
+  }
+
+  /* ── MONTH PAGE ── */
+  .month-page {
+    padding: 0;
+  }
+
+  .month-scroll-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 0 16px;
+  }
+
+  table.month-table {
+    border-collapse: collapse;
+    width: max-content;
+  }
+
+  table.month-table th, table.month-table td {
+    border: 0.5px solid rgba(197,212,232,0.4);
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .col-name-m { width: 130px; min-width: 130px; }
+  .col-day-m  { width: 30px;  min-width: 30px; }
+  .col-tot-m  { width: 46px;  min-width: 46px; }
+
+  table.month-table thead th {
+    font-family: 'Special Elite', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    color: var(--ink-faint);
+    padding: 6px 2px 3px;
+    background: var(--paper-mid);
+    position: sticky;
+    top: 0;
+  }
+
+  table.month-table thead th.th-name {
+    text-align: left;
+    padding-left: 12px;
+  }
+
+  th.th-today { color: var(--ink-light) !important; font-weight: 700; }
+
+  .sleep-row-m td {
+    background: rgba(197,212,232,0.12);
+    height: 28px;
+    border-bottom: 1.5px solid var(--margin);
+  }
+
+  .sleep-row-m td.td-label-m {
+    text-align: left;
+    padding-left: 12px;
+    font-size: 12px;
+    color: var(--ink-light);
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  .sleep-in-m {
+    width: 100%;
+    height: 26px;
+    font-family: 'Kalam', cursive;
+    font-size: 11px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--accent);
+    padding: 0;
+  }
+
+  .habit-row-m td { height: 32px; }
+  .habit-row-m td.td-name-m {
+    text-align: left;
+    padding-left: 12px;
+    font-size: 14px;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+  }
+  .habit-row-m td.td-name-m.empty-m {
+    color: var(--ink-faint);
+    font-style: italic;
+    font-size: 12px;
+  }
+  .habit-row-m:nth-child(even) td { background: rgba(197,212,232,0.06); }
+  .td-today-m { background: rgba(0,0,0,0.025) !important; }
+
+  .circle-m {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.8px solid #b8c0d8;
+    background: transparent;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-family: 'Kalam', cursive;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all .12s;
+  }
+  .circle-m.done { border-color: var(--accent); color: #2a50a0; }
+  .circle-m.skip { border-color: #c0c0cc; color: #aaaabc; font-weight: 400; font-size: 11px; }
+  .circle-m:active { transform: scale(.85); }
+
+  .pct-row-m td {
+    border-top: 2px solid var(--paper-dark);
+    background: rgba(197,212,232,0.07);
+    height: 26px;
+    padding: 2px 1px;
+  }
+  .pct-row-m td.td-label-m {
+    text-align: left;
+    padding-left: 12px;
+    font-family: 'Special Elite', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  .pct-num-m {
+    font-family: 'Kalam', cursive;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  td.td-total-m {
+    font-size: 11px;
+    color: var(--ink-light);
+    padding: 0 4px;
+    white-space: nowrap;
+  }
+
+  /* ── ADD HABIT (month page) ── */
+  .add-row-m td {
+    padding: 10px 12px 14px;
+    border-top: 1px dashed var(--line);
+    text-align: left;
+  }
+
+  .add-btn-m {
+    background: none;
+    border: 1px dashed var(--ink-faint);
+    color: var(--ink-faint);
+    font-family: 'Kalam', cursive;
+    font-size: 15px;
+    padding: 5px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+
+  /* ── BOTTOM HINT ── */
+  .hint {
+    padding: 12px 16px;
+    font-family: 'Caveat', cursive;
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-style: italic;
+    text-align: center;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ── SAVED ── */
+  .saved-banner {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 8px 20px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+    z-index: 100;
+    text-transform: uppercase;
+  }
+  .saved-banner.show { opacity: 1; }
+
+  ::-webkit-scrollbar { height: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--paper-dark); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar" style="max-width:480px">
+  <div class="topbar-row1">
+    <span class="app-name">Caderno de Hábitos</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="pct-badge" id="pct-badge">—</span>
+    </div>
+  </div>
+  <div class="month-nav">
+    <button class="nav-btn" id="btn-prev">‹</button>
+    <span class="month-label" id="month-label">—</span>
+    <button class="nav-btn" id="btn-next">›</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs" style="max-width:480px;position:sticky;top:88px;z-index:40">
+  <button class="tab active" id="tab-hoje" onclick="switchTab('hoje')">✦ Hoje</button>
+  <button class="tab" id="tab-mes" onclick="switchTab('mes')">Mês completo</button>
+</div>
+
+<!-- TODAY PAGE -->
+<div class="page active" id="page-hoje">
+  <div class="today-page">
+    <p class="today-date" id="today-date">—</p>
+
+    <!-- Day progress -->
+    <div class="day-progress" id="day-progress-card"></div>
+
+    <!-- Sleep -->
+    <div class="sleep-card">
+      <span class="sleep-label">🌙 Horas de sono</span>
+      <input class="sleep-input-mobile" id="sleep-today" type="text" maxlength="5" placeholder="—">
+    </div>
+
+    <!-- Habit cards -->
+    <div id="habit-cards"></div>
+  </div>
+  <div class="hint">clique para marcar · toque duplo para anular (✕)</div>
+</div>
+
+<!-- MONTH PAGE -->
+<div class="page" id="page-mes">
+  <div class="month-page">
+    <div class="month-scroll-wrap">
+      <table class="month-table">
+        <thead><tr id="m-thead"></tr></thead>
+        <tbody id="m-tbody"></tbody>
+      </table>
+    </div>
+    <div class="hint">arraste para ver todos os dias · toque duplo na bolinha para anular</div>
+  </div>
+</div>
+
+<div class="saved-banner" id="saved-banner">✓ salvo</div>
+
+<script>
+const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const WEEKDAYS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+const daysInMonth = (y,m) => new Date(y,m+1,0).getDate();
+
+let S = {
+  year:  new Date().getFullYear(),
+  month: new Date().getMonth(),
+  habits: [],
+  data:  {},
+  sleep: {}
+};
+
+let currentTab = 'hoje';
+
+/* ── STORAGE ── */
+const mKey = () => `hb_${S.year}_${S.month}`;
+
+function persist() {
+  localStorage.setItem(mKey(), JSON.stringify({ habits: S.habits, data: S.data, sleep: S.sleep }));
+  const el = document.getElementById("saved-banner");
+  el.classList.add("show");
+  clearTimeout(window._st);
+  window._st = setTimeout(() => el.classList.remove("show"), 1500);
+}
+
+function loadMonth() {
+  try {
+    const d = JSON.parse(localStorage.getItem(mKey()));
+    if (d) {
+      S.habits = Array.isArray(d.habits) && d.habits.length ? d.habits : Array(10).fill("");
+      S.data   = d.data  || {};
+      S.sleep  = d.sleep || {};
+    } else {
+      S.habits = Array(10).fill("");
+      S.data   = {};
+      S.sleep  = {};
+    }
+  } catch {
+    S.habits = Array(10).fill("");
+    S.data   = {};
+    S.sleep  = {};
+  }
+}
+
+/* ── HELPERS ── */
+function rowKey(h, i) { return h.trim() ? h.trim() : `__row_${i}`; }
+
+function pctColor(p) {
+  return p >= 75 ? "#1a9090" : p >= 45 ? "#3a6aa0" : "#8888aa";
+}
+
+function calcDayPct(day) {
+  let tot=0, done=0;
+  S.habits.forEach((h,i) => {
+    const v = S.data[rowKey(h,i)+"|"+day];
+    if (v === 'skip') return;
+    tot++;
+    if (v === 'done') done++;
+  });
+  return tot ? Math.round(done/tot*100) : null;
+}
+
+function calcMonthPct() {
+  const now = new Date();
+  const isCur = S.year===now.getFullYear()&&S.month===now.getMonth();
+  const upto = isCur ? now.getDate() : daysInMonth(S.year,S.month);
+  let tot=0, done=0;
+  for (let d=1;d<=upto;d++) S.habits.forEach((h,i) => {
+    const v = S.data[rowKey(h,i)+"|"+d];
+    if (v==='skip') return;
+    tot++;
+    if (v==='done') done++;
+  });
+  return tot ? Math.round(done/tot*100) : null;
+}
+
+function cycleState(current) {
+  // single tap: vazio↔feito / done→null
+  if (current === 'done') return null;
+  return 'done';
+}
+
+function toggleSkip(current) {
+  return current === 'skip' ? null : 'skip';
+}
+
+/* ── TAB SWITCH ── */
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById(`page-${tab}`).classList.add('active');
+  if (tab === 'mes') renderMonth();
+  else renderToday();
+}
+
+/* ── RENDER HEADER ── */
+function renderHeader() {
+  document.getElementById("month-label").textContent = MONTHS[S.month] + " " + S.year;
+  const mp = calcMonthPct();
+  const badge = document.getElementById("pct-badge");
+  badge.textContent = mp !== null ? mp+"%" : "—";
+  badge.style.color = mp !== null ? pctColor(mp) : "var(--ink-faint)";
+}
+
+/* ── TODAY PAGE ── */
+function renderToday() {
+  const now = new Date();
+  const day = now.getDate();
+  const isCur = S.year===now.getFullYear()&&S.month===now.getMonth();
+  const targetDay = isCur ? day : 1;
+
+  // date label
+  const dateEl = document.getElementById("today-date");
+  if (isCur) {
+    dateEl.textContent = WEEKDAYS[now.getDay()] + ", " + day + " de " + MONTHS[S.month];
+  } else {
+    dateEl.textContent = MONTHS[S.month] + " " + S.year + " — visualizando dia 1";
+  }
+
+  // sleep
+  const sleepEl = document.getElementById("sleep-today");
+  sleepEl.value = S.sleep[targetDay] || "";
+  sleepEl.oninput = () => {
+    S.sleep[targetDay] = sleepEl.value;
+    persist();
+  };
+
+  // day progress
+  const dp = calcDayPct(targetDay);
+  const dpEl = document.getElementById("day-progress-card");
+  const dpColor = dp !== null ? pctColor(dp) : "var(--ink-faint)";
+  dpEl.innerHTML = `
+    <p class="day-progress-label">% de hábitos hoje</p>
+    <div class="day-progress-row">
+      <div class="day-progress-bar-wrap">
+        <div class="day-progress-bar-fill" style="width:${dp??0}%;background:${dpColor}"></div>
+      </div>
+      <span class="day-progress-pct" style="color:${dpColor}">${dp !== null ? dp+"%" : "—"}</span>
+    </div>`;
+
+  // habit cards
+  const cardsEl = document.getElementById("habit-cards");
+  cardsEl.innerHTML = "";
+
+  S.habits.forEach((h, i) => {
+    const rk = rowKey(h,i);
+    const key = `${rk}|${targetDay}`;
+    const state = S.data[key] || null;
+    const isEmpty = !h.trim();
+
+    const card = document.createElement("div");
+    card.className = `habit-card${state==='done'?' is-done':state==='skip'?' is-skip':''}`;
+
+    const inp = document.createElement("input");
+    inp.type = "text";
+    inp.className = `habit-name-mobile${isEmpty?" empty":""}`;
+    inp.value = isEmpty ? "" : h;
+    inp.placeholder = `Hábito ${i+1}...`;
+    inp.maxLength = 50;
+    inp.setAttribute("data-hi", i);
+    inp.addEventListener("input", () => {
+      const oldKey = rowKey(S.habits[i], i);
+      const newName = inp.value;
+      const newKey = newName.trim() ? newName.trim() : `__row_${i}`;
+      // migrate data keys
+      const nd = {};
+      Object.entries(S.data).forEach(([k,v]) => {
+        const sep = k.lastIndexOf("|");
+        const kh = k.slice(0,sep), kd = k.slice(sep+1);
+        nd[`${kh===oldKey?newKey:kh}|${kd}`] = v;
+      });
+      S.data = nd;
+      S.habits[i] = newName;
+      persist();
+    });
+    inp.addEventListener("focus", () => {
+      inp.classList.remove("empty");
+    });
+    inp.addEventListener("blur", () => {
+      if (!inp.value.trim()) inp.classList.add("empty");
+    });
+
+    const circle = document.createElement("div");
+    circle.className = `circle-touch${state==='done'?' done':state==='skip'?' skip':''}`;
+    circle.textContent = state==='done' ? '✓' : state==='skip' ? '✕' : '';
+
+    let tapTimer = null;
+    circle.addEventListener('click', () => {
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => {
+        S.data[key] = cycleState(state);
+        persist(); renderToday(); renderHeader();
+      }, 200);
+    });
+    circle.addEventListener('dblclick', () => {
+      clearTimeout(tapTimer);
+      S.data[key] = toggleSkip(state);
+      persist(); renderToday(); renderHeader();
+    });
+
+    card.appendChild(inp);
+    card.appendChild(circle);
+    cardsEl.appendChild(card);
+  });
+
+  renderHeader();
+}
+
+/* ── MONTH GRID ── */
+function renderMonth() {
+  const now = new Date();
+  const isCur = S.year===now.getFullYear()&&S.month===now.getMonth();
+  const days = daysInMonth(S.year, S.month);
+  const dayArr = Array.from({length:days},(_,i)=>i+1);
+
+  /* thead */
+  const thead = document.getElementById("m-thead");
+  thead.innerHTML = `<th class="col-name-m th-name">HÁBITO</th>` +
+    dayArr.map(d => {
+      const isT = isCur && d===now.getDate();
+      return `<th class="col-day-m${isT?" th-today":""}">${d}</th>`;
+    }).join("") +
+    `<th class="col-tot-m">TOT</th>`;
+
+  const tbody = document.getElementById("m-tbody");
+  let html = "";
+
+  /* sleep row */
+  html += `<tr class="sleep-row-m">
+    <td class="td-label-m">🌙 Sono</td>
+    ${dayArr.map(d => {
+      const isT = isCur && d===now.getDate();
+      return `<td class="${isT?"td-today-m":""}">
+        <input class="sleep-in-m" type="text" maxlength="4"
+          value="${esc(S.sleep[d]||"")}" placeholder="·" data-sd="${d}">
+      </td>`;
+    }).join("")}
+    <td></td>
+  </tr>`;
+
+  /* habit rows */
+  S.habits.forEach((h, i) => {
+    const rk = rowKey(h, i);
+    const cnt  = dayArr.filter(d => S.data[rk+"|"+d]==='done').length;
+    const skip = dayArr.filter(d => S.data[rk+"|"+d]==='skip').length;
+    const isEmpty = !h.trim();
+    html += `<tr class="habit-row-m" data-ri="${i}">
+      <td class="td-name-m col-name-m">
+        <input type="text" class="td-name-input-m${isEmpty?" empty-m":""}"
+          value="${esc(h)}" placeholder="Hábito ${i+1}..."
+          maxlength="50" data-mhi="${i}">
+      </td>
+      ${dayArr.map(d => {
+        const v = S.data[rk+"|"+d]||null;
+        const isT = isCur && d===now.getDate();
+        let txt = v==='done'?'✓':v==='skip'?'✕':'';
+        let cls = `circle-m${v==='done'?' done':v==='skip'?' skip':''}`;
+        return `<td class="${isT?"td-today-m":""}">
+          <div class="${cls}" data-rk="${escAttr(rk)}" data-d="${d}">${txt}</div>
+        </td>`;
+      }).join("")}
+      <td class="td-total-m">${cnt}/${days-skip}</td>
+    </tr>`;
+  });
+
+  /* pct row */
+  html += `<tr class="pct-row-m">
+    <td class="td-label-m">% DIA</td>
+    ${dayArr.map(d => {
+      const p = calcDayPct(d);
+      const c = p !== null ? pctColor(p) : "var(--line)";
+      const isT = isCur && d===now.getDate();
+      return `<td class="${isT?"td-today-m":""}">
+        <span class="pct-num-m" style="color:${c}">${p!==null?p+"%":"·"}</span>
+      </td>`;
+    }).join("")}
+    <td></td>
+  </tr>`;
+
+  /* add row */
+  html += `<tr class="add-row-m">
+    <td colspan="${days+2}">
+      <button class="add-btn-m" id="m-add-btn">+ Nova linha</button>
+    </td>
+  </tr>`;
+
+  tbody.innerHTML = html;
+  bindMonthEvents(dayArr);
+  renderHeader();
+}
+
+function bindMonthEvents(dayArr) {
+  /* habit name inputs in month grid */
+  document.querySelectorAll(".td-name-input-m[data-mhi]").forEach(el => {
+    el.addEventListener("input", () => {
+      const i = +el.dataset.mhi;
+      const oldKey = rowKey(S.habits[i], i);
+      const newName = el.value;
+      const newKey = newName.trim() ? newName.trim() : `__row_${i}`;
+      const nd = {};
+      Object.entries(S.data).forEach(([k,v]) => {
+        const sep = k.lastIndexOf("|");
+        const kh = k.slice(0,sep), kd = k.slice(sep+1);
+        nd[`${kh===oldKey?newKey:kh}|${kd}`] = v;
+      });
+      S.data = nd;
+      S.habits[i] = newName;
+      persist();
+    });
+  });
+
+  /* circles */
+  document.querySelectorAll(".circle-m[data-rk]").forEach(el => {
+    let timer = null;
+    el.addEventListener('click', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const k = el.dataset.rk + "|" + el.dataset.d;
+        const cur = S.data[k]||null;
+        S.data[k] = cur==='done' ? null : 'done';
+        persist(); renderMonth(); renderHeader();
+      }, 200);
+    });
+    el.addEventListener('dblclick', () => {
+      clearTimeout(timer);
+      const k = el.dataset.rk + "|" + el.dataset.d;
+      S.data[k] = S.data[k]==='skip' ? null : 'skip';
+      persist(); renderMonth(); renderHeader();
+    });
+  });
+
+  /* sleep */
+  document.querySelectorAll(".sleep-in-m").forEach(el => {
+    el.addEventListener('input', () => {
+      S.sleep[parseInt(el.dataset.sd)] = el.value;
+      persist();
+    });
+  });
+
+  /* add */
+  const addBtn = document.getElementById("m-add-btn");
+  if (addBtn) {
+    addBtn.onclick = () => {
+      S.habits.push("");
+      persist();
+      renderMonth();
+      if (currentTab==='hoje') renderToday();
+    };
+  }
+}
+
+/* ── NAV ── */
+document.getElementById("btn-prev").onclick = () => {
+  if(S.month===0){S.year--;S.month=11;}else S.month--;
+  loadMonth();
+  if (currentTab==='hoje') renderToday();
+  else renderMonth();
+  renderHeader();
+};
+document.getElementById("btn-next").onclick = () => {
+  if(S.month===11){S.year++;S.month=0;}else S.month++;
+  loadMonth();
+  if (currentTab==='hoje') renderToday();
+  else renderMonth();
+  renderHeader();
+};
+
+function esc(s)     { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return String(s).replace(/"/g,'&quot;'); }
+
+/* ── INIT ── */
+loadMonth();
+renderToday();
+renderHeader();
+/* ── SERVICE WORKER ── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+</script>
+</body>
+</html>
